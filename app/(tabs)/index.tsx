@@ -1,75 +1,196 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+  TouchableOpacity,
+  Animated,
+  RefreshControl,
+  Platform,
+} from 'react-native';
+import { useTheme } from '@/context/ThemeContext';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useCoinData } from '@/hooks/useCoinData';
+import CoinListItem from '@/components/CoinListItem';
+import MarketTabs from '@/components/MarketTabs';
+import { Search } from 'lucide-react-native';
+import HeaderBar from '@/components/HeaderBar';
+import { useNavigation } from 'expo-router';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const TABS = ['Featured', 'Top Gainers', 'Top Losers'];
 
-export default function HomeScreen() {
+export default function MarketScreen() {
+  const { colors } = useTheme();
+  const { coins, loading, error, loadMore, refreshData, filterByType } =
+    useCoinData();
+  const [activeTab, setActiveTab] = useState(0);
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    // Apply filter based on active tab
+    if (activeTab === 0) {
+      filterByType('market_cap_desc');
+    } else if (activeTab === 1) {
+      filterByType('top_gainers');
+    } else {
+      filterByType('top_losers');
+    }
+  }, [activeTab]);
+
+  const handleTabChange = (index: number) => {
+    setActiveTab(index);
+  };
+
+  const handleCoinPress = (coinId: string) => {
+    // navigation.navigate('coin-details' as never, { id: coinId } as never);
+  };
+
+  if (error) {
+    return (
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors.background }]}
+      >
+        <HeaderBar title="Market" scrollY={scrollY} />
+        <View style={styles.errorContainer}>
+          <Text style={[styles.errorText, { color: colors.text }]}>
+            Error loading market data. Please try again later.
+          </Text>
+          <TouchableOpacity
+            style={[styles.retryButton, { backgroundColor: colors.primary }]}
+            onPress={refreshData}
+          >
+            <Text style={styles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  const renderListHeader = () => (
+    <View style={styles.headerContainer}>
+      <View style={styles.searchBarContainer}>
+        <TouchableOpacity
+          style={[
+            styles.searchBar,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <Search size={18} color={colors.subtext} />
+          <Text style={[styles.searchBarText, { color: colors.subtext }]}>
+            Search cryptocurrencies...
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <MarketTabs
+        tabs={TABS}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+      />
+    </View>
+  );
+
+  const renderFooter = () => {
+    if (!loading) return null;
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="small" color={colors.primary} />
+      </View>
+    );
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <SafeAreaView edges={['top']} style={{ flex: 1 }}>
+        <HeaderBar title="Market" scrollY={scrollY} />
+
+        <Animated.FlatList
+          data={coins}
+          renderItem={({ item }) => (
+            <CoinListItem
+              coin={item}
+              onPress={() => handleCoinPress(item.id)}
+            />
+          )}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContent}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.5}
+          ListHeaderComponent={renderListHeader}
+          ListFooterComponent={renderFooter}
+          refreshControl={
+            <RefreshControl
+              refreshing={loading && coins.length === 0}
+              onRefresh={refreshData}
+              tintColor={colors.primary}
+              colors={[colors.primary]}
+            />
+          }
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: Platform.OS !== 'web' }
+          )}
+          scrollEventThrottle={16}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+  },
+  headerContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+  },
+  searchBarContainer: {
+    marginVertical: 8,
+  },
+  searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  searchBarText: {
+    fontFamily: 'Inter-Regular',
+    marginLeft: 8,
+    fontSize: 14,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  listContent: {
+    paddingBottom: 100,
+  },
+  loaderContainer: {
+    paddingVertical: 20,
+    alignItems: 'center',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  errorText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  retryButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    fontFamily: 'Inter-SemiBold',
+    color: 'white',
+    fontSize: 14,
   },
 });
