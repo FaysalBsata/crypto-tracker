@@ -69,11 +69,19 @@ export async function fetchCoinOHLC(
     });
 
     return response.data.map((item: any) => ({
-      timestamp: item[0],
-      open: item[1],
-      high: item[2],
-      low: item[3],
-      close: item[4],
+      date: item.date,
+      usd: {
+        open: item.usd.open,
+        high: item.usd.high,
+        low: item.usd.low,
+        close: item.usd.close,
+      },
+      aed: {
+        open: item.aed.open,
+        high: item.aed.high,
+        low: item.aed.low,
+        close: item.aed.close,
+      },
     }));
   } catch (error) {
     console.error(`Error fetching OHLC data for ${coinId}:`, error);

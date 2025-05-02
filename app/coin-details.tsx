@@ -19,7 +19,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const CHART_TYPES = ['Line', 'Candlestick'];
-const TIME_PERIODS = ['1D', '7D', '30D', '1Y', 'All'];
+const TIME_PERIODS = ['1D', '7D', '30D', '1Y'];
 
 export default function CoinDetailsScreen() {
   const { colors } = useTheme();
@@ -27,9 +27,17 @@ export default function CoinDetailsScreen() {
   const { id } = useLocalSearchParams();
   const [chartType, setChartType] = useState(CHART_TYPES[0]);
   const [timePeriod, setTimePeriod] = useState('30D');
+  const [currency, setCurrency] = useState<'usd' | 'aed'>('usd');
 
   const { coin, chartData, loading, error, fetchCoinData, fetchChartData } =
     useCoinDetails(id as string);
+
+  // Transform the data to match the expected format
+  const transformedChartData = chartData.map((item) => ({
+    date: item.date,
+    usd: item.usd,
+    aed: item.aed,
+  }));
 
   useEffect(() => {
     let days: number | string = 30;
@@ -231,11 +239,55 @@ export default function CoinDetailsScreen() {
             />
           ) : (
             <CoinChart
-              data={chartData}
+              data={transformedChartData}
               type={chartType.toLowerCase()}
               priceColor={priceChangeColor}
+              currency={currency}
             />
           )}
+        </View>
+
+        <View style={styles.currencySelector}>
+          <TouchableOpacity
+            style={[
+              styles.currencyButton,
+              currency === 'usd' && { backgroundColor: colors.primary + '20' },
+            ]}
+            onPress={() => setCurrency('usd')}
+          >
+            <Text
+              style={[
+                styles.currencyText,
+                {
+                  color: currency === 'usd' ? colors.primary : colors.subtext,
+                  fontFamily:
+                    currency === 'usd' ? 'Inter-SemiBold' : 'Inter-Medium',
+                },
+              ]}
+            >
+              USD
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.currencyButton,
+              currency === 'aed' && { backgroundColor: colors.primary + '20' },
+            ]}
+            onPress={() => setCurrency('aed')}
+          >
+            <Text
+              style={[
+                styles.currencyText,
+                {
+                  color: currency === 'aed' ? colors.primary : colors.subtext,
+                  fontFamily:
+                    currency === 'aed' ? 'Inter-SemiBold' : 'Inter-Medium',
+                },
+              ]}
+            >
+              AED
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <CoinStats coin={coin} />
@@ -401,5 +453,19 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     fontSize: 14,
     lineHeight: 22,
+  },
+  currencySelector: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+  currencyButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginHorizontal: 4,
+  },
+  currencyText: {
+    fontSize: 14,
   },
 });

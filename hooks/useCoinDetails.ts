@@ -3,11 +3,19 @@ import { useCallback, useEffect, useState } from 'react';
 import { Coin } from './useCoinData';
 
 type ChartDataPoint = {
-  timestamp: number;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
+  date: number;
+  usd: {
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+  };
+  aed: {
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+  };
 };
 
 export function useCoinDetails(coinId: string) {

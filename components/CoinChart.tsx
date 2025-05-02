@@ -2,46 +2,37 @@ import { useTheme } from '@/context/ThemeContext';
 import { format } from 'date-fns';
 import React from 'react';
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
-import {
-  VictoryArea,
-  VictoryAxis,
-  VictoryCandlestick,
-  VictoryChart,
-  VictoryTheme,
-} from 'victory-native';
-
-// Type declarations for victory-native components
-declare module 'victory-native' {
-  export const VictoryChart: any;
-  export const VictoryAxis: any;
-  export const VictoryTheme: any;
-  export const VictoryArea: any;
-  export const VictoryCandlestick: any;
-}
+import { Area, CartesianChart, Line } from 'victory-native';
 
 interface ChartDataPoint {
-  timestamp: number;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-}
-
-interface CandlestickDataPoint {
-  x: number;
-  open: number;
-  close: number;
-  high: number;
-  low: number;
+  date: number;
+  usd: {
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+  };
+  aed: {
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+  };
 }
 
 interface CoinChartProps {
   data: ChartDataPoint[];
   type: string;
   priceColor: string;
+  currency?: 'usd' | 'aed';
 }
 
-export default function CoinChart({ data, type, priceColor }: CoinChartProps) {
+export default function CoinChart({
+  data,
+  type,
+  priceColor,
+  currency = 'usd',
+}: CoinChartProps) {
   const { colors } = useTheme();
   const screenWidth = Dimensions.get('window').width - 32; // Account for padding
 
@@ -60,100 +51,44 @@ export default function CoinChart({ data, type, priceColor }: CoinChartProps) {
     return format(date, 'MM/dd');
   };
 
-  // Format data for VictoryLine
-  const lineData = data.map((point) => ({
-    x: point.timestamp,
-    y: point.close,
-  }));
-
-  // Format data for VictoryCandlestick
-  const candlestickData = data.map((point) => ({
-    x: point.timestamp,
-    open: point.open,
-    close: point.close,
-    high: point.high,
-    low: point.low,
+  // Format data for the chart
+  const chartData = data.map((point) => ({
+    date: point.date,
+    value: point[currency].close,
+    open: point[currency].open,
+    high: point[currency].high,
+    low: point[currency].low,
   }));
 
   return (
     <View style={styles.container}>
-      {type === 'line' ? (
-        <VictoryChart
-          width={screenWidth}
-          height={280}
-          theme={VictoryTheme.material}
-          padding={{ top: 10, bottom: 40, left: 50, right: 20 }}
+      <View
+        style={[styles.chartContainer, { width: screenWidth, height: 280 }]}
+      >
+        <CartesianChart
+          data={chartData}
+          xKey="date"
+          yKeys={['value']}
+          axisOptions={{
+            formatXLabel: (value) => formatDate(value),
+            formatYLabel: (value) => value.toFixed(2),
+            tickCount: { x: 5, y: 5 },
+          }}
         >
-          <VictoryAxis
-            tickFormat={formatDate}
-            style={{
-              axis: { stroke: colors.border },
-              tickLabels: { fill: colors.subtext, fontSize: 10 },
-            }}
-          />
-          <VictoryAxis
-            dependentAxis
-            style={{
-              axis: { stroke: colors.border },
-              tickLabels: { fill: colors.subtext, fontSize: 10 },
-            }}
-          />
-          <VictoryArea
-            data={lineData}
-            style={{
-              data: {
-                fill: `${priceColor}20`,
-                stroke: priceColor,
-                strokeWidth: 2,
-              },
-            }}
-            animate={{
-              duration: 500,
-              onLoad: { duration: 500 },
-            }}
-          />
-        </VictoryChart>
-      ) : (
-        <VictoryChart
-          width={screenWidth}
-          height={280}
-          theme={VictoryTheme.material}
-          domainPadding={{ x: 25 }}
-          padding={{ top: 10, bottom: 40, left: 50, right: 20 }}
-        >
-          <VictoryAxis
-            tickFormat={formatDate}
-            style={{
-              axis: { stroke: colors.border },
-              tickLabels: { fill: colors.subtext, fontSize: 10 },
-            }}
-          />
-          <VictoryAxis
-            dependentAxis
-            style={{
-              axis: { stroke: colors.border },
-              tickLabels: { fill: colors.subtext, fontSize: 10 },
-            }}
-          />
-          <VictoryCandlestick
-            data={candlestickData}
-            candleColors={{
-              positive: colors.positive,
-              negative: colors.negative,
-            }}
-            style={{
-              data: {
-                stroke: ({ datum }: { datum: CandlestickDataPoint }) =>
-                  datum.close > datum.open ? colors.positive : colors.negative,
-              },
-            }}
-            animate={{
-              duration: 500,
-              onLoad: { duration: 500 },
-            }}
-          />
-        </VictoryChart>
-      )}
+          {({ points }) =>
+            type === 'line' ? (
+              <Area
+                points={points.value}
+                color={priceColor}
+                opacity={0.2}
+                y0={0}
+              />
+            ) : (
+              <Line points={points.value} color={priceColor} strokeWidth={2} />
+            )
+          }
+        </CartesianChart>
+      </View>
     </View>
   );
 }
@@ -162,6 +97,9 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
   },
+  chartContainer: {
+    overflow: 'hidden',
+  },
   emptyContainer: {
     height: 280,
     justifyContent: 'center',
@@ -169,7 +107,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   emptyText: {
-    fontFamily: 'Inter-Medium',
     fontSize: 14,
   },
 });
