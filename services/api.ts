@@ -59,7 +59,6 @@ export async function fetchCoinOHLC(
   coinId: string,
   days: number | string = 30
 ) {
-  console.log('fetching coin ohlc', coinId, days);
   try {
     const response = await axios.get(`${BASE_URL}/coin-ohlc`, {
       params: {
@@ -87,25 +86,6 @@ export async function fetchCoinOHLC(
     console.error(`Error fetching OHLC data for ${coinId}:`, error);
     throw new Error('Failed to fetch chart data');
   }
-}
-
-// Helper function to convert coin IDs to product IDs
-// In a real app, this would be provided by the API
-function getProductIdFromCoinId(coinId: string): number {
-  const coinIdMapping: Record<string, number> = {
-    bitcoin: 1,
-    ethereum: 2,
-    tether: 3,
-    binancecoin: 4,
-    ripple: 5,
-    solana: 6,
-    usdc: 7,
-    'staked-ether': 8,
-    cardano: 9,
-    'avalanche-2': 10,
-  };
-
-  return coinIdMapping[coinId] || 2; // Default to ethereum if unknown
 }
 
 // Generate mock sparkline data for demo purposes

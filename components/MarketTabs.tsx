@@ -1,4 +1,5 @@
 import { useTheme } from '@/context/ThemeContext';
+import { Star, TrendingDown, TrendingUp } from 'lucide-react-native';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -14,6 +15,34 @@ export default function MarketTabs({
   onTabChange,
 }: MarketTabsProps) {
   const { colors } = useTheme();
+
+  const getTabIcon = (index: number) => {
+    switch (index) {
+      case 0:
+        return (
+          <Star
+            size={16}
+            color={index === activeTab ? 'white' : colors.subtext}
+          />
+        );
+      case 1:
+        return (
+          <TrendingUp
+            size={16}
+            color={index === activeTab ? 'white' : colors.subtext}
+          />
+        );
+      case 2:
+        return (
+          <TrendingDown
+            size={16}
+            color={index === activeTab ? 'white' : colors.subtext}
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
     <View
@@ -34,18 +63,21 @@ export default function MarketTabs({
           ]}
           onPress={() => onTabChange(index)}
         >
-          <Text
-            style={[
-              styles.tabText,
-              {
-                color: index === activeTab ? 'white' : colors.subtext,
-                fontFamily:
-                  index === activeTab ? 'Inter-SemiBold' : 'Inter-Regular',
-              },
-            ]}
-          >
-            {tab}
-          </Text>
+          <View style={styles.tabContent}>
+            {getTabIcon(index)}
+            <Text
+              style={[
+                styles.tabText,
+                {
+                  color: index === activeTab ? 'white' : colors.subtext,
+                  fontFamily:
+                    index === activeTab ? 'Inter-SemiBold' : 'Inter-Regular',
+                },
+              ]}
+            >
+              {tab}
+            </Text>
+          </View>
         </TouchableOpacity>
       ))}
     </View>
@@ -65,6 +97,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
     borderRadius: 8,
+  },
+  tabContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   activeTab: {
     shadowColor: 'rgba(0, 0, 0, 0.1)',

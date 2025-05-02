@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet, Animated, Platform } from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
 import { BlurView } from 'expo-blur';
+import React from 'react';
+import { Animated, Platform, StyleSheet, Text, View } from 'react-native';
 
 interface HeaderBarProps {
   title: string;
@@ -10,7 +10,7 @@ interface HeaderBarProps {
 
 export default function HeaderBar({ title, scrollY }: HeaderBarProps) {
   const { colors, isDark } = useTheme();
-  
+
   const headerOpacity = scrollY
     ? scrollY.interpolate({
         inputRange: [0, 50, 100],
@@ -20,7 +20,7 @@ export default function HeaderBar({ title, scrollY }: HeaderBarProps) {
     : new Animated.Value(1);
 
   return (
-    <Animated.View 
+    <Animated.View
       style={[
         styles.headerContainer,
         {
@@ -28,16 +28,24 @@ export default function HeaderBar({ title, scrollY }: HeaderBarProps) {
           borderBottomColor: colors.border,
         },
         {
-          opacity: headerOpacity
-        }
+          opacity: headerOpacity,
+        },
       ]}
     >
       <View style={styles.headerContent}>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>{title}</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>
+          {title}
+        </Text>
       </View>
       {Platform.OS === 'ios' && (
-        <Animated.View style={[styles.blurContainer, { opacity: headerOpacity }]}>
-          <BlurView intensity={25} tint={isDark ? 'dark' : 'light'} style={styles.blurView} />
+        <Animated.View
+          style={[styles.blurContainer, { opacity: headerOpacity }]}
+        >
+          <BlurView
+            intensity={25}
+            tint={isDark ? 'dark' : 'light'}
+            style={styles.blurView}
+          />
         </Animated.View>
       )}
     </Animated.View>
@@ -56,6 +64,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    zIndex: 999,
   },
   headerTitle: {
     fontFamily: 'Inter-Bold',
