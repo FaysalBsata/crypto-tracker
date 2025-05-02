@@ -23,15 +23,14 @@ export default function TabLayout() {
           ios: {
             borderTopColor: colors.border,
             elevation: 0,
-            // height: 60,
             paddingBottom: 20,
             paddingTop: 8,
+            backgroundColor: colors.background,
           },
           default: {
-            backgroundColor: colors.card,
+            backgroundColor: colors.background,
             borderTopColor: colors.border,
             elevation: 0,
-            // height: 60,
             paddingBottom: 8,
             paddingTop: 8,
           },
