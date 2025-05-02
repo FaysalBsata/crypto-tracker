@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const BASE_URL = 'https://coingeko.burjx.com';
 
-export async function fetchAllCoins(page = 1, pageSize = 10) {
+export async function fetchAllCoins(page = 1, pageSize = 20) {
   try {
     const response = await axios.get(`${BASE_URL}/coin-prices-all`, {
       params: {

@@ -1,23 +1,22 @@
-import React, { useState, useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  FlatList,
-  ActivityIndicator,
-  TouchableOpacity,
-  Animated,
-  RefreshControl,
-  Platform,
-} from 'react-native';
-import { useTheme } from '@/context/ThemeContext';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useCoinData } from '@/hooks/useCoinData';
 import CoinListItem from '@/components/CoinListItem';
-import MarketTabs from '@/components/MarketTabs';
-import { Search } from 'lucide-react-native';
 import HeaderBar from '@/components/HeaderBar';
-import { useNavigation } from 'expo-router';
+import MarketTabs from '@/components/MarketTabs';
+import { useTheme } from '@/context/ThemeContext';
+import { useCoinData } from '@/hooks/useCoinData';
+import { useNavigation, useRouter } from 'expo-router';
+import { Search } from 'lucide-react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  Animated,
+  Platform,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const TABS = ['Featured', 'Top Gainers', 'Top Losers'];
 
@@ -43,9 +42,9 @@ export default function MarketScreen() {
   const handleTabChange = (index: number) => {
     setActiveTab(index);
   };
-
+  const router = useRouter();
   const handleCoinPress = (coinId: string) => {
-    // navigation.navigate('coin-details' as never, { id: coinId } as never);
+    router.push(`/coin-details?id=${coinId}`);
   };
 
   if (error) {
@@ -111,11 +110,12 @@ export default function MarketScreen() {
           data={coins}
           renderItem={({ item }) => (
             <CoinListItem
+              key={item.id}
               coin={item}
               onPress={() => handleCoinPress(item.id)}
             />
           )}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item, index) => `${item.id}-${index}`}
           contentContainerStyle={styles.listContent}
           onEndReached={loadMore}
           onEndReachedThreshold={0.5}

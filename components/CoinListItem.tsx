@@ -11,7 +11,6 @@ interface CoinListItemProps {
 }
 
 function CoinListItem({ coin, onPress }: CoinListItemProps) {
-  console.log('🚀 ~ CoinListItem ~ coin:', coin);
   const { colors } = useTheme();
 
   const priceChangeColor =

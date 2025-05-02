@@ -1,13 +1,18 @@
-import React from 'react';
-import { Tabs } from 'expo-router';
-import { ChartBar as BarChart2, Chrome as Home, TrendingUp, Settings } from 'lucide-react-native';
 import { useTheme } from '@/context/ThemeContext';
-import { Platform } from 'react-native';
 import { BlurView } from 'expo-blur';
+import { Tabs } from 'expo-router';
+import {
+  ChartBar as BarChart2,
+  Chrome as Home,
+  Settings,
+  TrendingUp,
+} from 'lucide-react-native';
+import React from 'react';
+import { Platform } from 'react-native';
 
 export default function TabLayout() {
   const { colors, isDark } = useTheme();
-  
+
   return (
     <Tabs
       screenOptions={{
@@ -16,10 +21,9 @@ export default function TabLayout() {
         tabBarInactiveTintColor: colors.subtext,
         tabBarStyle: Platform.select({
           ios: {
-            backgroundColor: 'transparent',
             borderTopColor: colors.border,
             elevation: 0,
-            height: 60,
+            // height: 60,
             paddingBottom: 20,
             paddingTop: 8,
           },
@@ -27,37 +31,49 @@ export default function TabLayout() {
             backgroundColor: colors.card,
             borderTopColor: colors.border,
             elevation: 0,
-            height: 60,
+            // height: 60,
             paddingBottom: 8,
             paddingTop: 8,
-          }
+          },
         }),
-        tabBarBackground: Platform.OS === 'ios' 
-          ? () => (
-              <BlurView 
-                intensity={isDark ? 40 : 60} 
-                tint={isDark ? "dark" : "light"}
-                style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
-              />
-            ) 
-          : undefined,
+        tabBarBackground:
+          Platform.OS === 'ios'
+            ? () => (
+                <BlurView
+                  intensity={isDark ? 40 : 60}
+                  tint={isDark ? 'systemThickMaterialDark' : 'light'}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                  }}
+                />
+              )
+            : undefined,
         tabBarLabelStyle: {
           fontFamily: 'Inter-Medium',
           fontSize: 12,
         },
-      }}>
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
           title: 'Market',
-          tabBarIcon: ({ color, size }) => <BarChart2 size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <BarChart2 size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
         name="watchlist"
         options={{
           title: 'Watchlist',
-          tabBarIcon: ({ color, size }) => <TrendingUp size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <TrendingUp size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
@@ -71,7 +87,9 @@ export default function TabLayout() {
         name="settings"
         options={{
           title: 'Settings',
-          tabBarIcon: ({ color, size }) => <Settings size={size} color={color} />,
+          tabBarIcon: ({ color, size }) => (
+            <Settings size={size} color={color} />
+          ),
         }}
       />
     </Tabs>

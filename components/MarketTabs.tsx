@@ -1,6 +1,6 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { useTheme } from '@/context/ThemeContext';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface MarketTabsProps {
   tabs: string[];
@@ -8,20 +8,29 @@ interface MarketTabsProps {
   onTabChange: (index: number) => void;
 }
 
-export default function MarketTabs({ tabs, activeTab, onTabChange }: MarketTabsProps) {
+export default function MarketTabs({
+  tabs,
+  activeTab,
+  onTabChange,
+}: MarketTabsProps) {
   const { colors } = useTheme();
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.card, borderColor: colors.border }]}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: colors.card, borderColor: colors.border },
+      ]}
+    >
       {tabs.map((tab, index) => (
         <TouchableOpacity
-          key={tab}
+          key={`${tab}-${index}`}
           style={[
             styles.tab,
             index === activeTab && [
               styles.activeTab,
-              { backgroundColor: colors.primary }
-            ]
+              { backgroundColor: colors.primary },
+            ],
           ]}
           onPress={() => onTabChange(index)}
         >
@@ -30,7 +39,8 @@ export default function MarketTabs({ tabs, activeTab, onTabChange }: MarketTabsP
               styles.tabText,
               {
                 color: index === activeTab ? 'white' : colors.subtext,
-                fontFamily: index === activeTab ? 'Inter-SemiBold' : 'Inter-Regular',
+                fontFamily:
+                  index === activeTab ? 'Inter-SemiBold' : 'Inter-Regular',
               },
             ]}
           >

@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  ScrollView, 
-  ActivityIndicator,
-  Image,
-  Dimensions
-} from 'react-native';
-import { useTheme } from '@/context/ThemeContext';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, ChevronDown, Star, Share2 } from 'lucide-react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useCoinDetails } from '@/hooks/useCoinDetails';
 import CoinChart from '@/components/CoinChart';
 import CoinStats from '@/components/CoinStats';
+import { useTheme } from '@/context/ThemeContext';
+import { useCoinDetails } from '@/hooks/useCoinDetails';
 import { formatCurrency, formatPercent } from '@/utils/formatters';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { ArrowLeft, Share2, Star } from 'lucide-react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const CHART_TYPES = ['Line', 'Candlestick'];
 const TIME_PERIODS = ['1D', '7D', '30D', '1Y', 'All'];
@@ -27,24 +27,28 @@ export default function CoinDetailsScreen() {
   const { id } = useLocalSearchParams();
   const [chartType, setChartType] = useState(CHART_TYPES[0]);
   const [timePeriod, setTimePeriod] = useState('30D');
-  
-  const { 
-    coin, 
-    chartData, 
-    loading, 
-    error, 
-    fetchCoinData,
-    fetchChartData
-  } = useCoinDetails(id as string);
+
+  const { coin, chartData, loading, error, fetchCoinData, fetchChartData } =
+    useCoinDetails(id as string);
 
   useEffect(() => {
-    let days = 30;
+    let days: number | string = 30;
     switch (timePeriod) {
-      case '1D': days = 1; break;
-      case '7D': days = 7; break;
-      case '30D': days = 30; break;
-      case '1Y': days = 365; break;
-      case 'All': days = 'max'; break;
+      case '1D':
+        days = 1;
+        break;
+      case '7D':
+        days = 7;
+        break;
+      case '30D':
+        days = 30;
+        break;
+      case '1Y':
+        days = 365;
+        break;
+      case 'All':
+        days = 'max';
+        break;
     }
     fetchChartData(days);
   }, [timePeriod]);
@@ -55,12 +59,16 @@ export default function CoinDetailsScreen() {
 
   if (loading && !coin) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors.background }]}
+      >
         <View style={styles.header}>
           <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
             <ArrowLeft size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>Loading...</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>
+            Loading...
+          </Text>
           <View style={styles.rightPlaceholder} />
         </View>
         <View style={styles.loadingContainer}>
@@ -72,19 +80,23 @@ export default function CoinDetailsScreen() {
 
   if (error || !coin) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors.background }]}
+      >
         <View style={styles.header}>
           <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
             <ArrowLeft size={24} color={colors.text} />
           </TouchableOpacity>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>Error</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>
+            Error
+          </Text>
           <View style={styles.rightPlaceholder} />
         </View>
         <View style={styles.errorContainer}>
           <Text style={[styles.errorText, { color: colors.text }]}>
             Error loading coin data. Please try again.
           </Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.retryButton, { backgroundColor: colors.primary }]}
             onPress={() => fetchCoinData()}
           >
@@ -95,53 +107,62 @@ export default function CoinDetailsScreen() {
     );
   }
 
-  const priceChangeColor = coin.price_change_percentage_24h >= 0 
-    ? colors.positive 
-    : colors.negative;
+  const priceChangeColor =
+    coin.priceChangePercentage24h >= 0 ? colors.positive : colors.negative;
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <View style={styles.header}>
         <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
           <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
           <Image source={{ uri: coin.image }} style={styles.coinIcon} />
-          <Text style={[styles.headerTitle, { color: colors.text }]}>{coin.name}</Text>
-          <Text style={[styles.headerSymbol, { color: colors.subtext }]}>{coin.symbol.toUpperCase()}</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>
+            {coin.name}
+          </Text>
+          <Text style={[styles.headerSymbol, { color: colors.subtext }]}>
+            {coin.symbol.toUpperCase()}
+          </Text>
         </View>
         <TouchableOpacity style={styles.starButton}>
           <Star size={22} color={colors.subtext} />
         </TouchableOpacity>
       </View>
-      
-      <ScrollView 
+
+      <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.priceContainer}>
           <Text style={[styles.price, { color: colors.text }]}>
-            {formatCurrency(coin.current_price)}
+            {formatCurrency(coin.currentPrice)}
           </Text>
-          <View style={[
-            styles.priceChangeContainer, 
-            { backgroundColor: priceChangeColor + '20' }
-          ]}>
+          <View
+            style={[
+              styles.priceChangeContainer,
+              { backgroundColor: priceChangeColor + '20' },
+            ]}
+          >
             <Text style={[styles.priceChange, { color: priceChangeColor }]}>
-              {formatPercent(coin.price_change_percentage_24h)}
+              {formatPercent(coin.priceChangePercentage24h)}
             </Text>
           </View>
-          
+
           <TouchableOpacity style={styles.shareButton}>
             <Share2 size={20} color={colors.subtext} />
           </TouchableOpacity>
         </View>
-        
+
         <View style={styles.chartTypeContainer}>
-          <View style={[
-            styles.chartTypeSelectorContainer, 
-            { backgroundColor: colors.card, borderColor: colors.border }
-          ]}>
+          <View
+            style={[
+              styles.chartTypeSelectorContainer,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
             {CHART_TYPES.map((type) => (
               <TouchableOpacity
                 key={type}
@@ -157,8 +178,10 @@ export default function CoinDetailsScreen() {
                   style={[
                     styles.chartTypeText,
                     {
-                      color: chartType === type ? colors.primary : colors.subtext,
-                      fontFamily: chartType === type ? 'Inter-SemiBold' : 'Inter-Medium',
+                      color:
+                        chartType === type ? colors.primary : colors.subtext,
+                      fontFamily:
+                        chartType === type ? 'Inter-SemiBold' : 'Inter-Medium',
                     },
                   ]}
                 >
@@ -168,7 +191,7 @@ export default function CoinDetailsScreen() {
             ))}
           </View>
         </View>
-        
+
         <View style={styles.timePeriodContainer}>
           {TIME_PERIODS.map((period) => (
             <TouchableOpacity
@@ -186,8 +209,10 @@ export default function CoinDetailsScreen() {
                 style={[
                   styles.timePeriodText,
                   {
-                    color: timePeriod === period ? colors.primary : colors.subtext,
-                    fontFamily: timePeriod === period ? 'Inter-SemiBold' : 'Inter-Medium',
+                    color:
+                      timePeriod === period ? colors.primary : colors.subtext,
+                    fontFamily:
+                      timePeriod === period ? 'Inter-SemiBold' : 'Inter-Medium',
                   },
                 ]}
               >
@@ -196,25 +221,35 @@ export default function CoinDetailsScreen() {
             </TouchableOpacity>
           ))}
         </View>
-        
+
         <View style={styles.chartContainer}>
           {loading ? (
-            <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 40 }} />
+            <ActivityIndicator
+              size="large"
+              color={colors.primary}
+              style={{ marginTop: 40 }}
+            />
           ) : (
-            <CoinChart 
-              data={chartData} 
-              type={chartType.toLowerCase()} 
-              priceColor={priceChangeColor} 
+            <CoinChart
+              data={chartData}
+              type={chartType.toLowerCase()}
+              priceColor={priceChangeColor}
             />
           )}
         </View>
-        
+
         <CoinStats coin={coin} />
-        
+
         <View style={styles.aboutContainer}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>About {coin.name}</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            About {coin.name}
+          </Text>
           <Text style={[styles.aboutText, { color: colors.subtext }]}>
-            {coin.description || `${coin.name} is a cryptocurrency with the symbol ${coin.symbol.toUpperCase()}. It is currently ranked #${coin.market_cap_rank} by market capitalization.`}
+            {`${
+              coin.name
+            } is a cryptocurrency with the symbol ${coin.symbol.toUpperCase()}. It is currently ranked #${
+              coin.market_cap_rank
+            } by market capitalization.`}
           </Text>
         </View>
       </ScrollView>

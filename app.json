@@ -10,7 +10,8 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.faysalbvoizzit.cryptotrack"
+      "bundleIdentifier": "com.faysalbvoizzit.cryptotrack",
+      "appleTeamId": "L55LL4HK8D"
     },
     "android": {
       "adaptiveIcon": {

@@ -114,14 +114,12 @@ export function useCoinData() {
         break;
       case 'top_gainers':
         filteredCoins.sort(
-          (a, b) =>
-            b.price_change_percentage_24h - a.price_change_percentage_24h
+          (a, b) => b.priceChangePercentage24h - a.priceChangePercentage24h
         );
         break;
       case 'top_losers':
         filteredCoins.sort(
-          (a, b) =>
-            a.price_change_percentage_24h - b.price_change_percentage_24h
+          (a, b) => a.priceChangePercentage24h - b.priceChangePercentage24h
         );
         break;
     }
