@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
-import { fetchCoinById, fetchCoinOHLC } from '@/services/api';
+import { fetchCoinOHLC } from '@/services/api';
+import { useCallback, useEffect, useState } from 'react';
 import { Coin } from './useCoinData';
 
 type ChartDataPoint = {
@@ -16,31 +16,37 @@ export function useCoinDetails(coinId: string) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchCoinData = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await fetchCoinById(coinId);
-      setCoin(data);
-      setError(null);
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setLoading(false);
-    }
-  }, [coinId]);
+  const fetchCoinData = useCallback(
+    async (days: number | string = 30) => {
+      try {
+        setLoading(true);
+        const data = await fetchCoinOHLC(coinId, days);
+        setCoin(data);
+        setError(null);
+      } catch (err) {
+        setError(err as Error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [coinId]
+  );
 
-  const fetchChartData = useCallback(async (days: number | string = 30) => {
-    try {
-      setLoading(true);
-      const data = await fetchCoinOHLC(coinId, days);
-      setChartData(data);
-      setError(null);
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setLoading(false);
-    }
-  }, [coinId]);
+  const fetchChartData = useCallback(
+    async (days: number | string = 30) => {
+      try {
+        setLoading(true);
+        const data = await fetchCoinOHLC(coinId, days);
+        setChartData(data);
+        setError(null);
+      } catch (err) {
+        setError(err as Error);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [coinId]
+  );
 
   useEffect(() => {
     fetchCoinData();
@@ -53,6 +59,6 @@ export function useCoinDetails(coinId: string) {
     loading,
     error,
     fetchCoinData,
-    fetchChartData
+    fetchChartData,
   };
 }

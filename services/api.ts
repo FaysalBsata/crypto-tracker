@@ -59,10 +59,11 @@ export async function fetchCoinOHLC(
   coinId: string,
   days: number | string = 30
 ) {
+  console.log('fetching coin ohlc', coinId, days);
   try {
     const response = await axios.get(`${BASE_URL}/coin-ohlc`, {
       params: {
-        productId: getProductIdFromCoinId(coinId),
+        productId: coinId,
         days,
       },
     });

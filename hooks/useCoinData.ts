@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 export interface Coin {
   id: string;
+  productId: string;
   symbol: string;
   name: string;
   image: string;

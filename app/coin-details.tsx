@@ -108,7 +108,7 @@ export default function CoinDetailsScreen() {
   }
 
   const priceChangeColor =
-    coin.priceChangePercentage24h >= 0 ? colors.positive : colors.negative;
+    coin?.priceChangePercentage24h >= 0 ? colors.positive : colors.negative;
 
   return (
     <SafeAreaView
@@ -119,12 +119,12 @@ export default function CoinDetailsScreen() {
           <ArrowLeft size={24} color={colors.text} />
         </TouchableOpacity>
         <View style={styles.headerTitleContainer}>
-          <Image source={{ uri: coin.image }} style={styles.coinIcon} />
+          <Image source={{ uri: coin?.image }} style={styles.coinIcon} />
           <Text style={[styles.headerTitle, { color: colors.text }]}>
-            {coin.name}
+            {coin?.name}
           </Text>
           <Text style={[styles.headerSymbol, { color: colors.subtext }]}>
-            {coin.symbol.toUpperCase()}
+            {coin?.symbol?.toUpperCase()}
           </Text>
         </View>
         <TouchableOpacity style={styles.starButton}>
@@ -138,7 +138,7 @@ export default function CoinDetailsScreen() {
       >
         <View style={styles.priceContainer}>
           <Text style={[styles.price, { color: colors.text }]}>
-            {formatCurrency(coin.currentPrice)}
+            {formatCurrency(coin?.currentPrice)}
           </Text>
           <View
             style={[
@@ -147,7 +147,7 @@ export default function CoinDetailsScreen() {
             ]}
           >
             <Text style={[styles.priceChange, { color: priceChangeColor }]}>
-              {formatPercent(coin.priceChangePercentage24h)}
+              {formatPercent(coin?.priceChangePercentage24h)}
             </Text>
           </View>
 
@@ -242,13 +242,13 @@ export default function CoinDetailsScreen() {
 
         <View style={styles.aboutContainer}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            About {coin.name}
+            About {coin?.name}
           </Text>
           <Text style={[styles.aboutText, { color: colors.subtext }]}>
             {`${
-              coin.name
-            } is a cryptocurrency with the symbol ${coin.symbol.toUpperCase()}. It is currently ranked #${
-              coin.market_cap_rank
+              coin?.name
+            } is a cryptocurrency with the symbol ${coin?.symbol?.toUpperCase()}. It is currently ranked #${
+              coin?.market_cap_rank
             } by market capitalization.`}
           </Text>
         </View>

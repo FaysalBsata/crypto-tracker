@@ -112,7 +112,7 @@ export default function MarketScreen() {
             <CoinListItem
               key={item.id}
               coin={item}
-              onPress={() => handleCoinPress(item.id)}
+              onPress={() => handleCoinPress(item.productId)}
             />
           )}
           keyExtractor={(item, index) => `${item.id}-${index}`}
