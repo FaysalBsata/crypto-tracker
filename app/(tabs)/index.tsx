@@ -13,20 +13,33 @@ import {
   RefreshControl,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const TABS = ['Featured', 'Top Gainers', 'Top Losers'];
+const DEBOUNCE_DELAY = 300; // 300ms delay
 
 export default function MarketScreen() {
   const { colors } = useTheme();
   const { coins, loading, error, loadMore, refreshData, filterByType } =
     useCoinData();
   const [activeTab, setActiveTab] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const scrollY = useRef(new Animated.Value(0)).current;
   const navigation = useNavigation();
+
+  // Debounce search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchQuery(searchQuery);
+    }, DEBOUNCE_DELAY);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   useEffect(() => {
     // Apply filter based on active tab
@@ -46,6 +59,13 @@ export default function MarketScreen() {
   const handleCoinPress = (coinId: string) => {
     router.push(`/coin-details?id=${coinId}`);
   };
+
+  // Filter coins based on debounced search query
+  const filteredCoins = coins.filter(
+    (coin) =>
+      coin.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+      coin.symbol.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
+  );
 
   if (error) {
     return (
@@ -71,17 +91,24 @@ export default function MarketScreen() {
   const renderListHeader = () => (
     <View style={styles.headerContainer}>
       <View style={styles.searchBarContainer}>
-        <TouchableOpacity
+        <View
           style={[
             styles.searchBar,
             { backgroundColor: colors.card, borderColor: colors.border },
           ]}
         >
           <Search size={18} color={colors.subtext} />
-          <Text style={[styles.searchBarText, { color: colors.subtext }]}>
-            Search cryptocurrencies...
-          </Text>
-        </TouchableOpacity>
+          <TextInput
+            style={[styles.searchBarText, { color: colors.text }]}
+            placeholder="Search cryptocurrencies..."
+            placeholderTextColor={colors.subtext}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            autoCapitalize="none"
+            autoCorrect={false}
+            // clearButtonMode="while-editing"
+          />
+        </View>
       </View>
 
       <MarketTabs
@@ -107,7 +134,7 @@ export default function MarketScreen() {
         <HeaderBar title="Market" scrollY={scrollY} />
 
         <Animated.FlatList
-          data={coins}
+          data={filteredCoins}
           renderItem={({ item }) => (
             <CoinListItem
               key={item.id}
@@ -121,6 +148,8 @@ export default function MarketScreen() {
           onEndReachedThreshold={0.5}
           ListHeaderComponent={renderListHeader}
           ListFooterComponent={renderFooter}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="none"
           refreshControl={
             <RefreshControl
               refreshing={loading && coins.length === 0}
