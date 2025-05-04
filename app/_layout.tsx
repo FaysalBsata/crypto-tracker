@@ -1,6 +1,5 @@
 import { AuthProvider } from '@/context/AuthContext';
 import { ThemeProvider } from '@/context/ThemeContext';
-import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import {
   Inter_400Regular,
   Inter_500Medium,
@@ -16,8 +15,6 @@ import { useEffect } from 'react';
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  useFrameworkReady();
-
   const [fontsLoaded, fontError] = useFonts({
     'Inter-Regular': Inter_400Regular,
     'Inter-Medium': Inter_500Medium,

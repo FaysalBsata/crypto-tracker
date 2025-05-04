@@ -6,12 +6,10 @@
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "cryptotrack",
-    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.faysalbsata.cryptotrack",
-      "appleTeamId": "L55LL4HK8D"
+      "bundleIdentifier": "com.faysalbsata.cryptotrack"
     },
     "android": {
       "adaptiveIcon": {
@@ -37,18 +35,19 @@
         {
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
+          "imageHeight": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#111827",
+          "backgroundColor": "#041525",
           "dark": {
             "image": "./assets/images/splash-icon.png",
-            "backgroundColor": "#111827"
+            "backgroundColor": "#041525"
           }
         }
       ],
       [
         "expo-local-authentication",
         {
-          "faceIDPermission": "Allow $(PRODUCT_NAME) to use Face ID."
+          "faceIDPermission": "Allow $(PRODUCT_NAME) to use Face ID for authentication."
         }
       ]
     ],
