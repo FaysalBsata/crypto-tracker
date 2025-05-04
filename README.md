@@ -13,7 +13,7 @@ Before you begin, ensure you have the following installed:
 
 1. Clone the repository:
 ```bash
-git clone <git@github.com:FaysalBsata/crypto-tracker.git>
+git clone git@github.com:FaysalBsata/crypto-tracker.git
 cd crypto-tracker
 ```
 
@@ -80,6 +80,3 @@ If you encounter any issues:
 
 For any issues or questions, please open an issue in the repository.
 
-## License
-
-[Your License Here] 
