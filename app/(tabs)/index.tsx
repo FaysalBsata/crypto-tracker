@@ -4,7 +4,7 @@ import MarketTabs from '@/components/MarketTabs';
 import { useTheme } from '@/context/ThemeContext';
 import { useCoinData } from '@/hooks/useCoinData';
 import { useRouter } from 'expo-router';
-import { Search } from 'lucide-react-native';
+import { Search, X } from 'lucide-react-native';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -121,7 +121,9 @@ export default function MarketScreen() {
               { backgroundColor: colors.card, borderColor: colors.border },
             ]}
           >
-            <Search size={18} color={colors.subtext} />
+            <View style={styles.searchIconContainer}>
+              <Search size={18} color={colors.subtext} />
+            </View>
             <TextInput
               ref={searchInputRef}
               style={[styles.searchBarText, { color: colors.text }]}
@@ -132,6 +134,18 @@ export default function MarketScreen() {
               autoCapitalize="none"
               autoCorrect={false}
             />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity
+                style={styles.clearIconContainer}
+                onPress={() => {
+                  setSearchQuery('');
+                  searchInputRef.current?.focus();
+                }}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <X size={18} color={colors.subtext} />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 
@@ -194,11 +208,24 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 12,
     borderWidth: 1,
+    position: 'relative',
   },
   searchBarText: {
     fontFamily: 'Inter-Regular',
-    marginLeft: 8,
     fontSize: 14,
+    flex: 1,
+    paddingLeft: 32,
+    paddingRight: 32,
+  },
+  searchIconContainer: {
+    position: 'absolute',
+    left: 16,
+    zIndex: 1,
+  },
+  clearIconContainer: {
+    position: 'absolute',
+    right: 16,
+    zIndex: 1,
   },
   listContent: {
     paddingBottom: 100,
