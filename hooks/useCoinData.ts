@@ -8,10 +8,10 @@ export interface Coin {
   name: string;
   image: string;
   currentPrice: number;
-  market_cap: number;
+  marketCap: number;
   market_cap_rank: number;
   fully_diluted_valuation: number;
-  total_volume: number;
+  tradingVolume: number;
   high_24h: number;
   low_24h: number;
   price_change_24h: number;
@@ -108,10 +108,10 @@ export function useCoinData() {
 
     switch (type) {
       case 'market_cap_desc':
-        filteredCoins.sort((a, b) => b.market_cap - a.market_cap);
+        filteredCoins.sort((a, b) => b.marketCap - a.marketCap);
         break;
       case 'volume_desc':
-        filteredCoins.sort((a, b) => b.total_volume - a.total_volume);
+        filteredCoins.sort((a, b) => b.tradingVolume - a.tradingVolume);
         break;
       case 'top_gainers':
         filteredCoins.sort(

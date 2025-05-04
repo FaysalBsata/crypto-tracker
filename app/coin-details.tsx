@@ -1,6 +1,7 @@
 import CoinChart from '@/components/CoinChart';
 import CoinStats from '@/components/CoinStats';
 import { useTheme } from '@/context/ThemeContext';
+import { Coin } from '@/hooks/useCoinData';
 import { useCoinDetails } from '@/hooks/useCoinDetails';
 import { formatCurrency, formatPercent } from '@/utils/formatters';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -24,13 +25,15 @@ const TIME_PERIODS = ['1D', '7D', '30D', '1Y'];
 export default function CoinDetailsScreen() {
   const { colors } = useTheme();
   const router = useRouter();
-  const { id } = useLocalSearchParams();
+  const { id, coinData } = useLocalSearchParams();
   const [chartType, setChartType] = useState(CHART_TYPES[0]);
   const [timePeriod, setTimePeriod] = useState('30D');
   const [currency, setCurrency] = useState<'usd' | 'aed'>('usd');
 
-  const { coin, chartData, loading, error, fetchCoinData, fetchChartData } =
-    useCoinDetails(id as string);
+  const coin = coinData ? (JSON.parse(coinData as string) as Coin) : null;
+  const { chartData, loading, error, fetchChartData } = useCoinDetails(
+    id as string
+  );
 
   // Transform the data to match the expected format
   const transformedChartData = chartData.map((item) => ({
@@ -106,9 +109,9 @@ export default function CoinDetailsScreen() {
           </Text>
           <TouchableOpacity
             style={[styles.retryButton, { backgroundColor: colors.primary }]}
-            onPress={() => fetchCoinData()}
+            onPress={() => router.back()}
           >
-            <Text style={styles.retryButtonText}>Retry</Text>
+            <Text style={styles.retryButtonText}>Go Back</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

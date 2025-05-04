@@ -57,7 +57,14 @@ export default function MarketScreen() {
   };
   const router = useRouter();
   const handleCoinPress = (coinId: string) => {
-    router.push(`/coin-details?id=${coinId}`);
+    const coin = coins.find((c) => c.productId === coinId);
+    router.push({
+      pathname: '/coin-details',
+      params: {
+        id: coinId,
+        coinData: JSON.stringify(coin),
+      },
+    });
   };
 
   // Memoize filtered coins

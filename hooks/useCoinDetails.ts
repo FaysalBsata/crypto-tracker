@@ -1,6 +1,5 @@
 import { fetchCoinOHLC } from '@/services/api';
 import { useCallback, useEffect, useState } from 'react';
-import { Coin } from './useCoinData';
 
 type ChartDataPoint = {
   date: number;
@@ -19,26 +18,9 @@ type ChartDataPoint = {
 };
 
 export function useCoinDetails(coinId: string) {
-  const [coin, setCoin] = useState<Coin | null>(null);
   const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-
-  const fetchCoinData = useCallback(
-    async (days: number | string = 30) => {
-      try {
-        setLoading(true);
-        const data = await fetchCoinOHLC(coinId, days);
-        setCoin(data);
-        setError(null);
-      } catch (err) {
-        setError(err as Error);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [coinId]
-  );
 
   const fetchChartData = useCallback(
     async (days: number | string = 30) => {
@@ -57,16 +39,13 @@ export function useCoinDetails(coinId: string) {
   );
 
   useEffect(() => {
-    fetchCoinData();
     fetchChartData();
-  }, [coinId, fetchCoinData, fetchChartData]);
+  }, [coinId, fetchChartData]);
 
   return {
-    coin,
     chartData,
     loading,
     error,
-    fetchCoinData,
     fetchChartData,
   };
 }

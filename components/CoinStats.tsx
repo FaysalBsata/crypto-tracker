@@ -1,6 +1,6 @@
 import { useTheme } from '@/context/ThemeContext';
 import { Coin } from '@/hooks/useCoinData';
-import { formatCurrency, formatLargeNumber } from '@/utils/formatters';
+import { formatCurrency } from '@/utils/formatters';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
@@ -14,38 +14,11 @@ export default function CoinStats({ coin }: CoinStatsProps) {
   const stats = [
     {
       label: 'Market Cap',
-      value: formatCurrency(coin?.market_cap),
+      value: formatCurrency(coin?.marketCap),
     },
     {
-      label: 'Volume (24h)',
-      value: formatCurrency(coin?.total_volume),
-    },
-    {
-      label: 'Circ. Supply',
-      value:
-        formatLargeNumber(coin?.circulating_supply) +
-        ' ' +
-        coin?.symbol?.toUpperCase(),
-    },
-    {
-      label: 'Total Supply',
-      value: coin?.total_supply
-        ? formatLargeNumber(coin?.total_supply) +
-          ' ' +
-          coin?.symbol?.toUpperCase()
-        : 'N/A',
-    },
-    {
-      label: 'Max Supply',
-      value: coin?.max_supply
-        ? formatLargeNumber(coin?.max_supply) +
-          ' ' +
-          coin?.symbol?.toUpperCase()
-        : 'No Limit',
-    },
-    {
-      label: 'All-Time High',
-      value: formatCurrency(coin?.ath),
+      label: 'Volume',
+      value: formatCurrency(coin?.tradingVolume),
     },
   ];
 
