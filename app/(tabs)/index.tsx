@@ -3,9 +3,9 @@ import HeaderBar from '@/components/HeaderBar';
 import MarketTabs from '@/components/MarketTabs';
 import { useTheme } from '@/context/ThemeContext';
 import { useCoinData } from '@/hooks/useCoinData';
-import { useNavigation, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { Search } from 'lucide-react-native';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Animated,
@@ -30,7 +30,7 @@ export default function MarketScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('');
   const scrollY = useRef(new Animated.Value(0)).current;
-  const navigation = useNavigation();
+  const searchInputRef = useRef<TextInput>(null);
 
   // Debounce search query
   useEffect(() => {
@@ -60,12 +60,14 @@ export default function MarketScreen() {
     router.push(`/coin-details?id=${coinId}`);
   };
 
-  // Filter coins based on debounced search query
-  const filteredCoins = coins.filter(
-    (coin) =>
-      coin.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-      coin.symbol.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
-  );
+  // Memoize filtered coins
+  const filteredCoins = useMemo(() => {
+    return coins.filter(
+      (coin) =>
+        coin.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+        coin.symbol.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
+    );
+  }, [coins, debouncedSearchQuery]);
 
   if (error) {
     return (
@@ -90,27 +92,6 @@ export default function MarketScreen() {
 
   const renderListHeader = () => (
     <View style={styles.headerContainer}>
-      <View style={styles.searchBarContainer}>
-        <View
-          style={[
-            styles.searchBar,
-            { backgroundColor: colors.card, borderColor: colors.border },
-          ]}
-        >
-          <Search size={18} color={colors.subtext} />
-          <TextInput
-            style={[styles.searchBarText, { color: colors.text }]}
-            placeholder="Search cryptocurrencies..."
-            placeholderTextColor={colors.subtext}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            autoCapitalize="none"
-            autoCorrect={false}
-            // clearButtonMode="while-editing"
-          />
-        </View>
-      </View>
-
       <MarketTabs
         tabs={TABS}
         activeTab={activeTab}
@@ -133,6 +114,27 @@ export default function MarketScreen() {
       <SafeAreaView edges={['top']} style={{ flex: 1 }}>
         <HeaderBar title="Market" scrollY={scrollY} />
 
+        <View style={styles.searchBarContainer}>
+          <View
+            style={[
+              styles.searchBar,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
+            <Search size={18} color={colors.subtext} />
+            <TextInput
+              ref={searchInputRef}
+              style={[styles.searchBarText, { color: colors.text }]}
+              placeholder="Search cryptocurrencies..."
+              placeholderTextColor={colors.subtext}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+          </View>
+        </View>
+
         <Animated.FlatList
           data={filteredCoins}
           renderItem={({ item }) => (
@@ -148,8 +150,13 @@ export default function MarketScreen() {
           onEndReachedThreshold={0.5}
           ListHeaderComponent={renderListHeader}
           ListFooterComponent={renderFooter}
-          keyboardShouldPersistTaps="handled"
+          keyboardShouldPersistTaps="always"
           keyboardDismissMode="none"
+          removeClippedSubviews={false}
+          maintainVisibleContentPosition={{
+            minIndexForVisible: 0,
+            autoscrollToTopThreshold: 10,
+          }}
           refreshControl={
             <RefreshControl
               refreshing={loading && coins.length === 0}
